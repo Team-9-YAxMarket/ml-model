@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from src.api.request_models import FullInfoRequest
 from src.api.response_models import HealthCheckResponse, RecommendationResponse
 from src.core.settings import settings
-from src.ml.ml_model import make_recommendation
+from src.ml import model
 
 
 def create_app() -> FastAPI:
@@ -31,7 +31,7 @@ def create_app() -> FastAPI:
     )
     def return_pack_recommendation(order_with_carton: FullInfoRequest) -> Any:
         try:
-            result = make_recommendation(order_with_carton.dict())
+            result = model.predict(order_with_carton.dict())
         except Exception:
             return JSONResponse(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
