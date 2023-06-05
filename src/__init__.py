@@ -3,8 +3,9 @@ from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+
 from src.api.request_models import FullInfoRequest
-from src.api.response_models import RecommendationResponse, HealthCheckResponse
+from src.api.response_models import HealthCheckResponse, RecommendationResponse
 from src.core.settings import settings
 from src.ml.ml_model import make_recommendation
 

@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, PositiveInt
 class HealthCheckResponse(BaseModel):
     status: str = "ok"
 
+
 class ResponseBase(BaseModel):
     """Response model base class.
 
