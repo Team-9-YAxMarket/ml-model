@@ -1,16 +1,15 @@
+import os
+
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import OrdinalEncoder
-from catboost import CatBoostClassifier
 import pickle
-from pickle import load
 import joblib
-from skmultilearn.model_selection import iterative_train_test_split 
 
-def predict(data): 
-    
+
+def predict(data):
+
     # Загрузка модели из файла - это понятно, внутри катбустер
-    with open("model.pcl", "rb") as fid:
+    with open("./src/ml/model.pcl", "rb") as fid:
         base_model = pickle.load(fid)
 
     # Преобразование словарей в датафреймы
@@ -23,7 +22,7 @@ def predict(data):
 
     # удалим часть информации о карготипах:
     df.drop(['type'], axis = 1, inplace = True)
-    
+
     # Создаем новый признак:
     df['pack_volume'] = df['size1'] * df['size2'] * df['size3']
 
@@ -32,8 +31,8 @@ def predict(data):
     'pack_volume': 'mean',
     'weight': 'mean',
     'sku': 'count'
-    }).reset_index() 
-    
+    }).reset_index()
+
     df_agg.rename(columns={'sku': 'item_count'}, inplace=True)
 
     # сведения о товарах в заказе:
@@ -52,10 +51,10 @@ def predict(data):
     encoder = joblib.load('model_encoder.pkl')
     predicted_labels = np.argmax(y_pred, axis=1)
     y_pred_norm = encoder.inverse_transform(predicted_labels.reshape(-1, 1))
-    
+
     ###############
     response = {
-      "orderid": "sdfsdf",
+      "orderId": data["orderId"],
       "package": y_pred_norm[0][0],
       "items": [
         {"sku": "unique_sku_1", "add_packs": ['пузырьки']},
@@ -68,5 +67,5 @@ def predict(data):
       "status": "ok"
     }
     ###############
- 
+
     return response
