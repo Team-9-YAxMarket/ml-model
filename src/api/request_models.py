@@ -1,9 +1,6 @@
-import uuid
 from decimal import Decimal
-from typing import List
-from uuid import UUID
 
-from pydantic import BaseModel, Extra, Field, NonNegativeInt, condecimal
+from pydantic import BaseModel, Extra
 
 
 class RequestBase(BaseModel):
@@ -19,35 +16,16 @@ class SKURequest(RequestBase):
     """SKU request model."""
 
     sku: str
-    size_1: condecimal(gt=Decimal(0)) = Field(..., alias="size1")
-    size_2: condecimal(gt=Decimal(0)) = Field(..., alias="size2")
-    size_3: condecimal(gt=Decimal(0)) = Field(..., alias="size3")
-    weight: condecimal(gt=Decimal(0))
-    sku_type: list[NonNegativeInt] = Field(..., alias="type")
+    count: int
+    size1: Decimal
+    size2: Decimal
+    size3: Decimal
+    weight: Decimal
+    type: list[int]
 
 
 class OrderRequest(RequestBase):
     """Order request model."""
 
-    #order_id: UUID = Field(..., alias="orderId")
-    orderid: str
+    orderId: str
     items: list[SKURequest]
-
-
-class CartonAmountRequest(RequestBase):
-    """Carton leftovers in the warehouse request model."""
-
-    carton_type: str
-    amount: NonNegativeInt
-
-# было
-# class FullInfoRequest(RequestBase):
-#     """Full info request model."""
-#
-#     order: OrderRequest
-#     carton_leftovers: list[CartonAmountRequest]
-
-#стало
-class FullInfoRequest(BaseModel):
-    orderid: OrderRequest
-    no_room_for: list

@@ -1,6 +1,5 @@
-from uuid import UUID
-
-from pydantic import BaseModel, Field, PositiveInt
+from typing import List, Optional
+from pydantic import BaseModel
 
 
 class HealthCheckResponse(BaseModel):
@@ -10,24 +9,20 @@ class HealthCheckResponse(BaseModel):
 class ResponseBase(BaseModel):
     """Response model base class.
 
-    It is forbidden to have fields not provided for by the scheme."""
-
+    It is forbidden to have fields not provided for by the scheme.
+    """
     class Config:
         allow_population_by_field_name = True
 
 
 class SKUResponse(ResponseBase):
     sku: str
-    amount: PositiveInt
-
-
-class PackResponse(ResponseBase):
-    packages: list[str]
-    items: list[SKUResponse]
+    add_packs: List[Optional[str]]
 
 
 class RecommendationResponse(ResponseBase):
-    #order_id: UUID = Field(..., alias="orderId")
-    orderid: str
-    packs: list[PackResponse]
     status: str = "Ok"
+    orderId: str
+    package: str
+    items: List[Optional[SKUResponse]]
+    no_room_for: List[Optional[SKUResponse]]
