@@ -27,6 +27,7 @@ class PackResponse(ResponseBase):
 
 
 class RecommendationResponse(ResponseBase):
-    order_id: UUID = Field(..., alias="orderId")
+    #order_id: UUID = Field(..., alias="orderId")
+    orderid: str
     packs: list[PackResponse]
     status: str = "Ok"

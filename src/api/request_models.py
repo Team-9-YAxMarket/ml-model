@@ -1,4 +1,6 @@
+import uuid
 from decimal import Decimal
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, condecimal
@@ -27,7 +29,8 @@ class SKURequest(RequestBase):
 class OrderRequest(RequestBase):
     """Order request model."""
 
-    order_id: UUID = Field(..., alias="orderId")
+    #order_id: UUID = Field(..., alias="orderId")
+    orderid: str
     items: list[SKURequest]
 
 
@@ -37,9 +40,14 @@ class CartonAmountRequest(RequestBase):
     carton_type: str
     amount: NonNegativeInt
 
+# было
+# class FullInfoRequest(RequestBase):
+#     """Full info request model."""
+#
+#     order: OrderRequest
+#     carton_leftovers: list[CartonAmountRequest]
 
-class FullInfoRequest(RequestBase):
-    """Full info request model."""
-
-    order: OrderRequest
-    carton_leftovers: list[CartonAmountRequest]
+#стало
+class FullInfoRequest(BaseModel):
+    orderid: OrderRequest
+    no_room_for: list

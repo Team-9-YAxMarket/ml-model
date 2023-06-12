@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import OrdinalEncoder
-from catboost import CatBoostClassifier
+#from sklearn.preprocessing import OrdinalEncoder
+#from catboost import CatBoostClassifier
 import pickle
 from pickle import load
 import joblib
-from skmultilearn.model_selection import iterative_train_test_split 
+#from skmultilearn.model_selection import iterative_train_test_split
 
 def predict(data): 
     
