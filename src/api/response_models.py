@@ -30,3 +30,4 @@ class RecommendationResponse(ResponseBase):
     order_id: UUID = Field(..., alias="orderId")
     packs: list[PackResponse]
     status: str = "Ok"
+

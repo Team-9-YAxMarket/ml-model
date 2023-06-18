@@ -19,15 +19,15 @@ def predict(data):
 
     df = pd.DataFrame(items)
     df["orderId"] = data.get("orderId", "default_orderId")
-    df = df[["orderId", "sku", "count", "size1", "size2", "size3", "weight", "type"]]
-    numeric_columns = ["size1", "size2", "size3", "weight"]
+    df = df[["orderId", "sku", "count", "length", "width", "height", "weight", "cargotypes"]]
+    numeric_columns = ["length", "width", "height", "weight"]
     df[numeric_columns] = df[numeric_columns].astype(float)
 
     # Удаляем столбец "type"
-    df.drop("type", axis=1, inplace=True)
+    df.drop("cargotypes", axis=1, inplace=True)
 
     # Создаем новый признак:
-    df['pack_volume'] = df['size1'] * df['size2'] * df['size3']
+    df['pack_volume'] = df['length'] * df['width'] * df['height']
 
     # Делаем агрегацию по уникальному заказу
     df_agg = df.groupby('orderId').agg({
@@ -53,8 +53,8 @@ def predict(data):
     # Создаем функцию, которая добавит все недостающие столбцы для обучения модели:
     def add_missing_columns(df_new):
         all_columns = ['orderId', 'pack_volume', 'weight', 'item_count', 'count_1', 'count_2', 'count_3',
-                       'pack_volume_1', 'pack_volume_2', 'pack_volume_3', 'size1_1', 'size1_2', 'size1_3',
-                       'size2_1', 'size2_2', 'size2_3', 'size3_1', 'size3_2', 'size3_3', 'sku_1', 'sku_2', 'sku_3',
+                       'pack_volume_1', 'pack_volume_2', 'pack_volume_3', 'length_1', 'length_2', 'length_3',
+                       'width_1', 'width_2', 'width_3', 'height_1', 'height_2', 'height_3', 'sku_1', 'sku_2', 'sku_3',
                        'weight_1', 'weight_2', 'weight_3']
         existing_columns = df_new.columns.tolist()
         missing_columns = list(set(all_columns) - set(existing_columns))
