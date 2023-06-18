@@ -4,6 +4,7 @@ import pickle
 import joblib
 import requests
 
+
 def predict(data):
     # Загрузка модели из файла на GitHub
     model_url = "https://github.com/Team-9-YAxMarket/ml-model/raw/main/src/ml/file_tun.pcl"
@@ -15,11 +16,22 @@ def predict(data):
     # Преобразование словарей в датафреймы
     items = data.get("items", [])
     if not items:
-        return 'пустой список items'
+        return "пустой список items"
 
     df = pd.DataFrame(items)
     df["orderId"] = data.get("orderId", "default_orderId")
-    df = df[["orderId", "sku", "count", "length", "width", "height", "weight", "cargotypes"]]
+    df = df[
+        [
+            "orderId",
+            "sku",
+            "count",
+            "length",
+            "width",
+            "height",
+            "weight",
+            "cargotypes",
+        ]
+    ]
     numeric_columns = ["length", "width", "height", "weight"]
     df[numeric_columns] = df[numeric_columns].astype(float)
 
@@ -27,35 +39,62 @@ def predict(data):
     df.drop("cargotypes", axis=1, inplace=True)
 
     # Создаем новый признак:
-    df['pack_volume'] = df['length'] * df['width'] * df['height']
+    df["pack_volume"] = df["length"] * df["width"] * df["height"]
 
     # Делаем агрегацию по уникальному заказу
-    df_agg = df.groupby('orderId').agg({
-        'pack_volume': 'mean',
-        'weight': 'mean',
-        'sku': 'count'
-    }).reset_index()
+    df_agg = (
+        df.groupby("orderId")
+        .agg({"pack_volume": "mean", "weight": "mean", "sku": "count"})
+        .reset_index()
+    )
 
-    df_agg.rename(columns={'sku': 'item_count'}, inplace=True)
+    df_agg.rename(columns={"sku": "item_count"}, inplace=True)
 
     # Проверяем значение item_count и возвращаем соответствующий результат
-    if df_agg['item_count'].max() > 3:
-        return 'рекомендована ручная сборка'
+    if df_agg["item_count"].max() > 3:
+        return "рекомендована ручная сборка"
 
     # Сведения о товарах в заказе:
-    order_agg = df.pivot_table(index='orderId', columns=df.groupby('orderId').cumcount() + 1, aggfunc='first')
-    order_agg.columns = [f'{col[0]}_{col[1]}' for col in order_agg.columns]
+    order_agg = df.pivot_table(
+        index="orderId",
+        columns=df.groupby("orderId").cumcount() + 1,
+        aggfunc="first",
+    )
+    order_agg.columns = [f"{col[0]}_{col[1]}" for col in order_agg.columns]
     order_agg = order_agg.reset_index()
 
     # Объединяем информацию о заказе
-    df_new = df_agg.merge(order_agg, how='inner', on='orderId')
+    df_new = df_agg.merge(order_agg, how="inner", on="orderId")
 
     # Создаем функцию, которая добавит все недостающие столбцы для обучения модели:
     def add_missing_columns(df_new):
-        all_columns = ['orderId', 'pack_volume', 'weight', 'item_count', 'count_1', 'count_2', 'count_3',
-                       'pack_volume_1', 'pack_volume_2', 'pack_volume_3', 'length_1', 'length_2', 'length_3',
-                       'width_1', 'width_2', 'width_3', 'height_1', 'height_2', 'height_3', 'sku_1', 'sku_2', 'sku_3',
-                       'weight_1', 'weight_2', 'weight_3']
+        all_columns = [
+            "orderId",
+            "pack_volume",
+            "weight",
+            "item_count",
+            "count_1",
+            "count_2",
+            "count_3",
+            "pack_volume_1",
+            "pack_volume_2",
+            "pack_volume_3",
+            "length_1",
+            "length_2",
+            "length_3",
+            "width_1",
+            "width_2",
+            "width_3",
+            "height_1",
+            "height_2",
+            "height_3",
+            "sku_1",
+            "sku_2",
+            "sku_3",
+            "weight_1",
+            "weight_2",
+            "weight_3",
+        ]
         existing_columns = df_new.columns.tolist()
         missing_columns = list(set(all_columns) - set(existing_columns))
         for col in missing_columns:
@@ -66,7 +105,7 @@ def predict(data):
     df_new = add_missing_columns(df_new)
 
     # Удаляем лишние столбцы
-    df_new.drop(['orderId', 'sku_1', 'sku_2', 'sku_3'], axis=1, inplace=True)
+    df_new.drop(["orderId", "sku_1", "sku_2", "sku_3"], axis=1, inplace=True)
 
     # Загрузка энкодера из файла на GitHub
     encoder_url = "https://github.com/Team-9-YAxMarket/ml-model/raw/main/src/ml/encoder.pkl"
