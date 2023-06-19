@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from src.api.request_models import Order
 from src.api.response_models import HealthCheckResponse, PredictResponse
@@ -9,7 +10,13 @@ from src.ml.model import predict
 
 def create_app() -> FastAPI:
     app = FastAPI(debug=settings.DEBUG, root_path=settings.ML_ROOT_PATH)
-
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     @app.get("/health/", response_model=HealthCheckResponse)
     def health():
         return {"status": "ok"}
