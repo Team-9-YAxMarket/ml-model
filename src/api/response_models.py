@@ -21,6 +21,6 @@ class SKUResponse(BaseModel):
 
 
 class PredictResponse(BaseModel):
-    orderId: str
+    orderId: Optional[str]
     package: str
     items: List[SKUResponse]

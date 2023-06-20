@@ -17,6 +17,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
     @app.get("/health/", response_model=HealthCheckResponse)
     def health():
         return {"status": "ok"}
