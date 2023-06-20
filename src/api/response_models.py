@@ -1,32 +1,26 @@
-from uuid import UUID
+from decimal import Decimal
+from typing import List, Optional
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import AnyUrl, BaseModel, PositiveInt
 
 
 class HealthCheckResponse(BaseModel):
     status: str = "ok"
 
 
-class ResponseBase(BaseModel):
-    """Response model base class.
-
-    It is forbidden to have fields not provided for by the scheme."""
-
-    class Config:
-        allow_population_by_field_name = True
-
-
-class SKUResponse(ResponseBase):
-    sku: str
-    amount: PositiveInt
+class SKUResponse(BaseModel):
+    sku: Optional[str]
+    count: Optional[PositiveInt]
+    length: Optional[Decimal]
+    width: Optional[Decimal]
+    height: Optional[Decimal]
+    weight: Optional[Decimal]
+    cargotypes: Optional[List[str]]
+    img: Optional[AnyUrl]
+    barcode: Optional[str]
 
 
-class PackResponse(ResponseBase):
-    packages: list[str]
-    items: list[SKUResponse]
-
-
-class RecommendationResponse(ResponseBase):
-    order_id: UUID = Field(..., alias="orderId")
-    packs: list[PackResponse]
-    status: str = "Ok"
+class PredictResponse(BaseModel):
+    orderId: str
+    package: str
+    items: List[SKUResponse]

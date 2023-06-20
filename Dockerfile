@@ -1,4 +1,6 @@
-FROM python:3.10-slim
+FROM python:3.9-slim
+
+RUN apt update
 
 RUN python -m pip install --upgrade pip
 
@@ -8,10 +10,8 @@ COPY requirements.txt .
 
 RUN pip3 install -r requirements.txt --no-cache-dir
 
-COPY run.py .
-COPY src /app/src
+COPY . .
 
-EXPOSE 8080/tcp
+EXPOSE 8000/tcp
 
-CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
-
+CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
